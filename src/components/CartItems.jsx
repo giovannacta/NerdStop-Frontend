@@ -3,7 +3,7 @@ import { ShopContext } from "../Context/ShopContext";
 import { TbTrash } from "react-icons/tb";
 
 const CartItems = () => {
-  const { all_products, cartItems, removeFromCart, getTotalCartAmount } =
+  const { products, cartItems, removeFromCart, getTotalCartAmount } =
     useContext(ShopContext);
 
   return (
@@ -20,32 +20,32 @@ const CartItems = () => {
           </tr>
         </thead>
         <tbody>
-          {all_products.map((e) => {
-            if (cartItems[e.id] > 0) {
+          {products.map((product) => {
+            if (cartItems[product._id] > 0) {
               return (
                 <tr
-                  key={e.id}
+                  key={product._id}
                   className="border-b border-gray-200 text-sm sm:text-base"
                 >
                   <td className="p-3 flex items-center">
                     <img
-                      src={e.image}
+                      src={product.image_urls[0]}
                       alt="productImg"
                       height={43}
                       width={43}
                       className="rounded-lg ring-1 ring-gray-300"
                     />
                   </td>
-                  <td className="p-3">{e.name}</td>
-                  <td className="p-3">${e.new_price}</td>
-                  <td className="p-3 text-center">{cartItems[e.id]}</td>
+                  <td className="p-3">{product.name}</td>
+                  <td className="p-3">${product.price}</td>
+                  <td className="p-3 text-center">{cartItems[product._id]}</td>
                   <td className="p-3 text-center">
-                    ${(cartItems[e.id] * e.new_price).toFixed(2)}
+                    ${(cartItems[product._id] * product.price).toFixed(2)}
                   </td>
                   <td className="p-3 text-center">
                     <button
                       className="text-red-600 hover:text-red-800"
-                      onClick={() => removeFromCart(e.id)}
+                      onClick={() => removeFromCart(product._id)}
                     >
                       <TbTrash size={20} />
                     </button>

@@ -1,58 +1,113 @@
-import { createContext, useState } from "react";
-import all_products from "../assets/all_products";
+import { createContext, useState, useEffect } from "react";
 
 export const ShopContext = createContext(null);
 
-const getDefaultCart = () => {
-  let cart = {};
-  for (let index = 0; index < all_products.length; index++) {
-    cart[index] = 0;
-  }
-  return cart;
-};
-
 const ShopContextProvider = (props) => {
-  const [cartItems, setCartItems] = useState(getDefaultCart());
+  const [products, setProducts] = useState([]);
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem("user");
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
 
-  const addToCart = (itemId) => {
-    setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] + 1 }));
-    console.log(cartItems);
+  const getStoredCart = (email) => {
+    const storedCart = localStorage.getItem(`cart_${email}`);
+    return storedCart ? JSON.parse(storedCart) : {};
   };
 
-  const removeFromCart = (itemId) => {
-    setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] - 1 }));
-  };
+  const [cartItems, setCartItems] = useState(() => {
+    return user ? getStoredCart(user.email) : {};
+  });
 
-  const getTotalCartAmount = () => {
-    let totalAmount = 0;
-    for (const item in cartItems) {
-      if (cartItems[item] > 0) {
-        let itemInfo = all_products.find(
-          (product) => product.id === Number(item)
-        );
-        totalAmount += itemInfo.new_price * cartItems[item];
+  // Get products from the API
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/api/products");
+        if (!response.ok) throw new Error("Error to find products");
+        const data = await response.json();
+        setProducts(data);
+      } catch (error) {
+        console.error("Error to find products:", error);
       }
+    };
+
+    fetchProducts();
+  }, []);
+
+  // Save cart items to local storage
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem(`cart_${user.email}`, JSON.stringify(cartItems));
     }
-    return totalAmount;
+  }, [cartItems, user]);
+
+  
+  const addToCart = (itemId) => {
+    setCartItems((prev) => {
+      const updatedCart = { ...prev, [itemId]: (prev[itemId] || 0) + 1 };
+      return updatedCart;
+    });
   };
 
+  
+  const removeFromCart = (itemId) => {
+    setCartItems((prev) => {
+      const updatedCart = {
+        ...prev,
+        [itemId]: Math.max((prev[itemId] || 0) - 1, 0),
+      };
+      return updatedCart;
+    });
+  };
+
+  
+  const getTotalCartAmount = () => {
+    return Object.keys(cartItems)
+      .reduce((total, itemId) => {
+        const product = products.find((p) => p._id === itemId);
+        return product ? total + product.price * cartItems[itemId] : total;
+      }, 0)
+      .toFixed(2);
+  };
+
+  
   const getTotalCartItems = () => {
-    let totalItem = 0
-    for (const item in cartItems) {
-        if (cartItems[item] > 0 ) {
-            totalItem += cartItems[item]
-        }
-    }
-    return totalItem
-  }
+    return Object.values(cartItems).reduce(
+      (total, quantity) => total + quantity,
+      0
+    );
+  };
+
+  
+  const login = (userData) => {
+    const updatedUser = {
+      ...userData,
+      isAdmin: userData.email === "admin@email.com",
+    };
+    setUser(updatedUser);
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+
+    
+    setCartItems(getStoredCart(userData.email));
+  };
+
+  
+  const logout = () => {
+    setUser(null);
+    setCartItems({});
+    localStorage.removeItem("user");
+  };
 
   const contextValue = {
-    all_products,
+    products,
     cartItems,
     addToCart,
     removeFromCart,
     getTotalCartAmount,
-    getTotalCartItems
+    getTotalCartItems,
+    user,
+    login,
+    logout,
   };
 
   return (

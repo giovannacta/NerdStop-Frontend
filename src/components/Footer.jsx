@@ -1,22 +1,25 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import FOOTER_LINKS  from '../assets/footer_links';
-import FOOTER_CONTACT from '../assets/footer_contact';
-import SOCIALS from '../assets/socials'
-
+import React from "react";
+import { Link } from "react-router-dom";
+import FOOTER_LINKS from "../assets/footer_links";
+import FOOTER_CONTACT from "../assets/footer_contact";
+import SOCIALS from "../assets/socials";
 
 const Footer = () => {
   return (
     <footer className="flexCenter pb-24 pt-20">
       <div className="max_padd_container flex w-full flex-col gap-14">
         <div className="flex flex-col items-start justify-center gap-[10%] md:flex-row">
-          <Link to="/" className="mb-10 bold-20">NerdStop</Link>
+          <Link to="/" className="mb-10 bold-20">
+            NerdStop
+          </Link>
           <div className="flex flex-wrap gap-8 sm:justify-between md:flex-1">
             {FOOTER_LINKS.map((col) => (
               <FooterColumn title={col.title} key={col.title}>
                 <ul className="flex flex-col gap-4 regular-14 text-gray-50">
                   {col.links.map((link) => (
-                    <Link to="/" key={link}>{link}</Link>
+                    <Link to="/" key={link}>
+                      {link}
+                    </Link>
                   ))}
                 </ul>
               </FooterColumn>
@@ -24,8 +27,13 @@ const Footer = () => {
             <div className="flex flex-col gap-5">
               <FooterColumn title={FOOTER_CONTACT.title}>
                 {FOOTER_CONTACT.links.map((link) => (
-                  <Link to="/" key={link.label} className="flex gap-4 md:flex-col lg:flex-row">
-                    <p>{link.label}:</p><p className="medium-14">{link.value}</p>
+                  <Link
+                    to="/"
+                    key={link.label}
+                    className="flex gap-4 md:flex-col lg:flex-row"
+                  >
+                    <p>{link.label}:</p>
+                    <p className="medium-14">{link.value}</p>
                   </Link>
                 ))}
               </FooterColumn>
@@ -34,7 +42,9 @@ const Footer = () => {
               <FooterColumn>
                 <ul className="flex gap-4">
                   {SOCIALS.links.map((link) => (
-                    <Link to="/" key={link}><img src={link} alt='socialIcon' height={22} width={22}/></Link>
+                    <Link to="/" key={link}>
+                      <img src={link} alt="socialIcon" height={22} width={22} />
+                    </Link>
                   ))}
                 </ul>
               </FooterColumn>
@@ -42,11 +52,13 @@ const Footer = () => {
           </div>
         </div>
         <div className="border bg-gray-50"></div>
-        <p className='text-center regular-14 text-gray-30'>2025 NerdStop | All rights reserved.</p>
+        <p className="text-center regular-14 text-gray-30">
+          2025 NerdStop | All rights reserved.
+        </p>
       </div>
     </footer>
   );
-}
+};
 
 const FooterColumn = ({ title, children }) => {
   return (
@@ -55,6 +67,6 @@ const FooterColumn = ({ title, children }) => {
       {children}
     </div>
   );
-}
+};
 
 export default Footer;
